@@ -17,15 +17,18 @@ class MyTopo( Topo ):
         Topo.__init__( self )
 
         # Add hosts and switches
-        leftHost = self.addHost( 'h1' )
-        rightHost = self.addHost( 'h2' )
-        leftSwitch = self.addSwitch( 's3' )
-        rightSwitch = self.addSwitch( 's4' )
-
+        host1 = self.addHost( 'h1' ,ip="10.0.1.100/24", defaultRoute ="via 10.0.1.1")
+        host2 = self.addHost( 'h2' ,ip="10.0.2.100/24", defaultRoute ="via 10.0.2.1")
+        host3 = self.addHost('h3',ip="10.0.3.100/24", defaultRoute ="via 10.0.3.1")
+        switch1= self.addSwitch( 's1' )
+        switch2= self.addSwitch( 's2' )
+        switch3= self.addSwitch('s3')
         # Add links
-        self.addLink( leftHost, leftSwitch )
-        self.addLink( leftSwitch, rightSwitch )
-        self.addLink( rightSwitch, rightHost )
-
+        self.addLink( host1, switch1 )
+        self.addLink( host2, switch2)
+        self.addLink(host3, switch3)
+        self.addLink( switch1, switch2 )
+        self.addLink( switch1, switch3 )
+        self.addLink(switch3, switch2)
 
 topos = { 'mytopo': ( lambda: MyTopo() ) }
