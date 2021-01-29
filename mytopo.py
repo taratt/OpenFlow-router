@@ -15,7 +15,7 @@ class MyTopo( Topo ):
 
         # Initialize topology
         Topo.__init__( self )
-        self.addController('c0')
+   
         # Add hosts and switches
         host1 = self.addHost( 'h1' ,ip="10.0.1.100/24", defaultRoute ="via 10.0.1.1")
         host2 = self.addHost( 'h2' ,ip="10.0.2.100/24", defaultRoute ="via 10.0.2.1")
