@@ -17,9 +17,9 @@ class MyTopo( Topo ):
         Topo.__init__( self )
 
         # Add hosts and switches
-        host1 = self.addHost( 'h1' ,ip="10.0.1.100/24", defaultRoute ="s1-eth1")
-        host2 = self.addHost( 'h2' ,ip="10.0.2.100/24", defaultRoute ="s1-eth2")
-        host3 = self.addHost( 'h3' ,ip="10.0.3.100/24", defaultRoute ="s1-eth3")
+        host1 = self.addHost( 'h1' ,ip="10.0.1.100/24", defaultRoute ="via s1-eth1")
+        host2 = self.addHost( 'h2' ,ip="10.0.2.100/24", defaultRoute ="via s1-eth2")
+        host3 = self.addHost( 'h3' ,ip="10.0.3.100/24", defaultRoute ="via s1-eth3")
         switch1= self.addSwitch( 's1' )
 
         # Add links
