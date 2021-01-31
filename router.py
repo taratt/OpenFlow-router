@@ -10,7 +10,7 @@ from pox.lib.packet.ipv4 import ipv4
 from pox.lib.packet.arp import arp
 from pox.lib.packet.icmp import echo, icmp
 
-#log = core.getLogger()
+log = core.getLogger()
 
 class myRouter(object):
     def __init__(self, connection):
@@ -19,9 +19,9 @@ class myRouter(object):
         self.mac_to_port ={}
         self.message_queue ={}
         self.ip_to_mac={
-            '10.0.1.1': '00:00:00:00:00:01',
-            '10.0.2.1': '00:00:00:00:00:02',
-            '10.0.3.1': '00:00:00:00:00:03'
+            '10.0.1.1': '00:00:00:00:00:11',
+            '10.0.2.1': '00:00:00:00:00:22',
+            '10.0.3.1': '00:00:00:00:00:33'
         }
 
         self.routing_table= {
@@ -37,7 +37,7 @@ class myRouter(object):
             fm.match.nw_proto = ipv4.ICMP_PROTOCOL
             fm.idle_timeout = 300
             fm.priority = 2
-            fm.actions.append(of.ofp_action_output(port= of.OFPP_ALL)) #action = send to controller
+            fm.actions.append(of.ofp_action_output(port= of.OFPP_CONTROLLER)) #action = send to controller
             self.connection.send(fm)
 
     def resend_packet(self, packet_in, out_port):
@@ -177,7 +177,7 @@ class myRouter(object):
 
         packet = event.parsed  # This is the parsed packet data.
         if not packet.parsed:
-           # log.warning("Ignoring incomplete packet")
+            log.warning("Ignoring incomplete packet")
             return
         packet_in = event.ofp  # The actual ofp_packet_in message.
         packet_source =str(packet.src)
@@ -197,7 +197,7 @@ class myRouter(object):
                     break
 
             if not reachable :
-                #log.debug("ICMP destination network unreachable")
+                log.debug("ICMP destination network unreachable")
                 self.dest_unreachable(packet, packet_in)
 
             else:
@@ -222,6 +222,6 @@ def launch():
     """
 
     def start_switch(event):
-            #log.debug("Controlling %s" % (event.connection,))
+            log.debug("Controlling %s" % (event.connection,))
             myRouter(event.connection)
             core.openflow.addListenerByName("ConnectionUp", start_switch)
