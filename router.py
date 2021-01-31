@@ -217,12 +217,12 @@ class Router(object):
                         self.message_queue[destination_str] = [destination_network, ipv4_datagram]
                         self.resend_packet(self.construct_ARP(destination_str,destination_network,out_port))
 
-def launch():
-    """
-    Starts the component
-    """
+def launch ():
+  """
+  Starts the component
+  """
+  def start_switch (event):
+    log.debug("Controlling %s" % (event.connection,))
+    Router(event.connection)
+  core.openflow.addListenerByName("ConnectionUp", start_switch)
 
-    def start_switch(event):
-            log.debug("Controlling %s" % (event.connection,))
-            Router(event.connection)
-            core.openflow.addListenerByName("ConnectionUp", start_switch)
