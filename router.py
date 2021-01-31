@@ -45,7 +45,7 @@ class myRouter(object):
             fm.match.nw_proto = ipv4.ICMP_PROTOCOL
             fm.idle_timeout = 300
             fm.priority = 100
-            fm.actions.append(of.ofp_action_output(port= of.OFPP_ALL)) #action = send to controller
+            fm.actions.append(of.ofp_action_output(port= of.OFPP_CONTROLLER)) #action = send to controller
             self.connection.send(fm)
 
     def resend_packet(self, packet_in, out_port):
