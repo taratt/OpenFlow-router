@@ -12,7 +12,7 @@ from pox.lib.packet.icmp import echo, icmp
 
 log = core.getLogger()
 
-class myRouter(object):
+class Router(object):
     def __init__(self, connection):
         self.connection = connection
         connection.addListeners(self)
@@ -221,5 +221,5 @@ def launch():
 
     def start_switch(event):
             log.debug("Controlling %s" % (event.connection,))
-            myRouter(event.connection)
+            Router(event.connection)
             core.openflow.addListenerByName("ConnectionUp", start_switch)
