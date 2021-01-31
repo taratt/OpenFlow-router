@@ -36,7 +36,7 @@ class myRouter(object):
             fm.match.nw_dst = IPAddr(address)
             fm.match.nw_proto = ipv4.ICMP_PROTOCOL
             fm.idle_timeout = 300
-            fm.priority = 2
+            fm.priority = 100
             fm.actions.append(of.ofp_action_output(port= of.OFPP_CONTROLLER)) #action = send to controller
             self.connection.send(fm)
 
@@ -88,14 +88,25 @@ class myRouter(object):
 
                 # fm = of.ofp_flow_mod()
                 # fm.match.dl_type = ethernet.IP_TYPE
-                # destination_network = self.message_queue[replying_ip][0]
+                destination_network = self.message_queue[replying_ip][0]
                 # fm.match.nw_dst = IPAddr(destination_network)
                 # fm.match.nw_proto = ipv4.ICMP_PROTOCOL
                 # fm.idle_timeout = 300
                 # fm.priority = 1
-                # out_port = self.routing_table[destination_network]['port']
+                out_port = self.routing_table[destination_network]['port']
                 # fm.actions.append(of.ofp_action_output(port = out_port))  # action = send to controller
                 # self.connection.send(fm)
+                msg = of.ofp_flow_mod()
+                msg.priority = 10
+                msg.match.dl_type = ethernet.IP_TYPE
+                msg.match.nw_proto = ipv4.ICMP_PROTOCOL
+                msg.match.set_nw_dst(self.message_queue[replying_ip][0])
+                # msg.match.nw_dst = IPAddr(srcip)
+                msg.actions.append(of.ofp_action_dl_addr.set_src(EthAddr(
+                    self.ip_to_mac[self.routing_table[self.message_queue[replying_ip][0]]['gateway']])))
+                msg.actions.append(of.ofp_action_dl_addr.set_dst(EthAddr(self.ip_to_mac[replying_ip])))
+                msg.actions.append(of.ofp_action_output(port=out_port))
+                self.connection.send(msg)
                 self.message_queue.pop(replying_ip)
 
     def sendIPv4(self, destination):
