@@ -215,7 +215,7 @@ class Router(object):
 
                     else:
                         self.message_queue[destination_str] = [destination_network, ipv4_datagram]
-                        self.resend_packet(self.construct_ARP(destination_str,destination_network,out_port))
+                        self.resend_packet(self.construct_ARP(destination_str,destination_network),out_port)
 
 def launch ():
   """
@@ -225,4 +225,3 @@ def launch ():
     log.debug("Controlling %s" % (event.connection,))
     Router(event.connection)
   core.openflow.addListenerByName("ConnectionUp", start_switch)
-
