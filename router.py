@@ -30,14 +30,17 @@ class Router(object):
             '10.0.3.0/24': {'host': '10.0.3.100', 'port': 3, 'gateway': '10.0.3.1'},
         }
         #static
-        for dest in self.ip_to_mac.keys():
-            msg = of.ofp_flow_mod()
-            msg.priority = 100
-            msg.match.dl_type = ethernet.IP_TYPE
-            msg.match.nw_proto = ipv4.ICMP_PROTOCOL
-            msg.match.nw_dst = IPAddr(dest)
-            msg.actions.append(of.ofp_action_output(port=of.OFPP_CONTROLLER))
-            self.connection.send(msg)
+        for address in self.ip_to_mac.keys():
+            fm =of.ofp_flow_mod()
+            fm.match._dl_type =ethernet.IP_TYPE
+            fm.match.nw_dst = IPAddr(address)
+            fm.match.nw_proto = ipv4.ICMP_PROTOCOL
+            fm.idle_timeout = 300
+            fm.priority = 2
+            print(address)
+            fm.actions.append(of.ofp_action_output(port= of.OFPP_CONTROLLER)) #action = send to controller
+            self.connection.send(fm)
+
     def resend_packet(self, packet_in, out_port):
         """
         Instructs the switch to resend a packet that it had sent to us.
