@@ -3,22 +3,14 @@
 """
 
 from pox.core import core
-from netaddr import *
-from pox.lib.revent import *
+import pox.openflow.libopenflow_01 as of
 from pox.lib.packet.ethernet import ethernet
+from pox.lib.addresses import EthAddr,IPAddr
 from pox.lib.packet.ipv4 import ipv4
 from pox.lib.packet.arp import arp
-from pox.lib.packet.icmp import icmp, echo
-from pox.lib.addresses import IPAddr, EthAddr
-from pox.lib.util import str_to_bool, dpid_to_str
-from pox.lib.recoco import Timer
+from pox.lib.packet.icmp import echo, icmp
 
-import pox.lib.packet as pkt
-import pox.openflow.libopenflow_01 as of
-import time
-import pox
-
-log = core.getLogger()
+#log = core.getLogger()
 
 class myRouter(object):
     def __init__(self, connection):
@@ -44,8 +36,8 @@ class myRouter(object):
             fm.match.nw_dst = IPAddr(address)
             fm.match.nw_proto = ipv4.ICMP_PROTOCOL
             fm.idle_timeout = 300
-            fm.priority = 100
-            fm.actions.append(of.ofp_action_output(port= of.OFPP_CONTROLLER)) #action = send to controller
+            fm.priority = 2
+            fm.actions.append(of.ofp_action_output(port= of.OFPP_ALL)) #action = send to controller
             self.connection.send(fm)
 
     def resend_packet(self, packet_in, out_port):
@@ -96,25 +88,15 @@ class myRouter(object):
 
                 # fm = of.ofp_flow_mod()
                 # fm.match.dl_type = ethernet.IP_TYPE
-                destination_network = self.message_queue[replying_ip][0]
+                # destination_network = self.message_queue[replying_ip][0]
                 # fm.match.nw_dst = IPAddr(destination_network)
                 # fm.match.nw_proto = ipv4.ICMP_PROTOCOL
                 # fm.idle_timeout = 300
                 # fm.priority = 1
-                out_port = self.routing_table[destination_network]['port']
+                # out_port = self.routing_table[destination_network]['port']
                 # fm.actions.append(of.ofp_action_output(port = out_port))  # action = send to controller
                 # self.connection.send(fm)
-                msg = of.ofp_flow_mod()
-                msg.priority = 10
-                msg.match.dl_type = ethernet.IP_TYPE
-                msg.match.nw_proto = ipv4.ICMP_PROTOCOL
-                msg.match.set_nw_dst(self.message_queue[replying_ip][0])
-                # msg.match.nw_dst = IPAddr(srcip)
-                msg.actions.append(of.ofp_action_dl_addr.set_src(EthAddr(
-                    self.ip_to_mac[self.routing_table[self.message_queue[replying_ip][0]]['gateway']])))
-                msg.actions.append(of.ofp_action_dl_addr.set_dst(EthAddr(self.ip_to_mac[replying_ip])))
-                msg.actions.append(of.ofp_action_output(port=out_port))
-                self.connection.send(msg)
+
                 self.message_queue.pop(replying_ip)
 
     def sendIPv4(self, destination):
@@ -195,7 +177,7 @@ class myRouter(object):
 
         packet = event.parsed  # This is the parsed packet data.
         if not packet.parsed:
-            log.warning("Ignoring incomplete packet")
+           # log.warning("Ignoring incomplete packet")
             return
         packet_in = event.ofp  # The actual ofp_packet_in message.
         packet_source =str(packet.src)
@@ -215,7 +197,7 @@ class myRouter(object):
                     break
 
             if not reachable :
-                log.debug("ICMP destination network unreachable")
+                #log.debug("ICMP destination network unreachable")
                 self.dest_unreachable(packet, packet_in)
 
             else:
@@ -240,6 +222,6 @@ def launch():
     """
 
     def start_switch(event):
-            log.debug("Controlling %s" % (event.connection,))
+            #log.debug("Controlling %s" % (event.connection,))
             myRouter(event.connection)
             core.openflow.addListenerByName("ConnectionUp", start_switch)
