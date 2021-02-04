@@ -157,7 +157,7 @@ class Router(object):
         ethernet_frame = ethernet()
         ethernet_frame.payload = request_message
         ethernet_frame.src = EthAddr(self.ip_to_mac[gateway])
-        ethernet_frame.dst = EthAddr ('AB:CD:EF:AB:CD:EF')
+        ethernet_frame.dst = EthAddr ('EF:CD:EF:CD:EF:CD')
         ethernet_frame.type = ethernet.ARP_TYPE
         return ethernet_frame
 
