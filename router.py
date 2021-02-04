@@ -17,7 +17,7 @@ class Router(object):
         self.connection = connection
         connection.addListeners(self)
         self.mac_to_port ={}
-        self.message_queue ={}
+        self.arp_set ={}
         self.ip_to_mac={
             '10.0.1.1': '00:00:00:00:00:11',
             '10.0.2.1': '00:00:00:00:00:22',
@@ -84,27 +84,17 @@ class Router(object):
                 if new_physical_address not in self.mac_to_port:
                     self.mac_to_port[new_physical_address] = packet_in.in_port
             #related to construction of the arp request
-            if replying_ip in self.message_queue.keys():
+            if replying_ip in self.arp_set.keys():
                 self.sendIPv4(replying_ip)
 
-                # fm = of.ofp_flow_mod()
-                # fm.match.dl_type = ethernet.IP_TYPE
-                # destination_network = self.message_queue[replying_ip][0]
-                # fm.match.nw_dst = IPAddr(destination_network)
-                # fm.match.nw_proto = ipv4.ICMP_PROTOCOL
-                # fm.idle_timeout = 300
-                # fm.priority = 1
-                # out_port = self.routing_table[destination_network]['port']
-                # fm.actions.append(of.ofp_action_output(port = out_port))  # action = send to controller
-                # self.connection.send(fm)
 
-                self.message_queue.pop(replying_ip)
+                self.arp_set.pop(replying_ip)
 
     def sendIPv4(self, destination):
-        arp_datagram = self.message_queue[destination][1]
+        arp_datagram = self.arp_set[destination][1]
         ethernet_frame = ethernet()
         ethernet_frame.payload = arp_datagram
-        destination_network = self.message_queue[destination][0]
+        destination_network = self.arp_set[destination][0]
         ethernet_frame.src = EthAddr(self.ip_to_mac[self.routing_table[destination_network]['gateway']])
         ethernet_frame.dst = EthAddr(self.ip_to_mac[destination])
         ethernet_frame.type = ethernet.IP_TYPE
@@ -214,7 +204,7 @@ class Router(object):
                         self.resend_packet(packet,out_port)
 
                     else:
-                        self.message_queue[destination_str] = [destination_network, ipv4_datagram]
+                        self.arp_set[destination_str] = [destination_network, ipv4_datagram]
                         self.resend_packet(self.construct_ARP(destination_str,destination_network),out_port)
 
 def launch ():
