@@ -9,7 +9,7 @@ from pox.lib.addresses import EthAddr,IPAddr
 from pox.lib.packet.ipv4 import ipv4
 from pox.lib.packet.arp import arp
 from pox.lib.packet.icmp import echo, icmp
-
+import pox.lib.packet as pkt
 log = core.getLogger()
 
 class Router(object):
@@ -29,6 +29,7 @@ class Router(object):
             '10.0.2.0/24': {'host': '10.0.2.100', 'port': 2, 'gateway': '10.0.2.1'},
             '10.0.3.0/24': {'host': '10.0.3.100', 'port': 3, 'gateway': '10.0.3.1'},
         }
+
         #static
         for address in self.ip_to_mac.keys():
             fm =of.ofp_flow_mod()
@@ -126,7 +127,7 @@ class Router(object):
 
     def dest_unreachable(self, packet, packet_in):
 
-        reply_message = icmp()
+        reply_message = pkt.unreach()
         reply_message.type = 3
         reply_message.payload = packet.payload.payload.payload
         reply_message.code = 0
@@ -157,7 +158,7 @@ class Router(object):
         ethernet_frame = ethernet()
         ethernet_frame.payload = request_message
         ethernet_frame.src = EthAddr(self.ip_to_mac[gateway])
-        ethernet_frame.dst = EthAddr ('EF:CD:EF:CD:EF:CD')
+        ethernet_frame.dst = EthAddr ('AB:CD:EF:AB:CD:EF')
         ethernet_frame.type = ethernet.ARP_TYPE
         return ethernet_frame
 
@@ -215,3 +216,4 @@ def launch ():
     log.debug("Controlling %s" % (event.connection,))
     Router(event.connection)
   core.openflow.addListenerByName("ConnectionUp", start_switch)
+
