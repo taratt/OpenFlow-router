@@ -38,7 +38,7 @@ class Router(object):
             fm.match.nw_proto = ipv4.ICMP_PROTOCOL
             fm.idle_timeout = 300
             fm.priority = 2
-            print(address)
+          
             fm.actions.append(of.ofp_action_output(port= of.OFPP_CONTROLLER)) #action = send to controller
             self.connection.send(fm)
 
