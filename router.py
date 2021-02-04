@@ -9,7 +9,7 @@ from pox.lib.addresses import EthAddr,IPAddr
 from pox.lib.packet.ipv4 import ipv4
 from pox.lib.packet.arp import arp
 from pox.lib.packet.icmp import echo, icmp
-import pox.lib.packet as pkt
+
 log = core.getLogger()
 
 class Router(object):
@@ -127,7 +127,7 @@ class Router(object):
 
     def dest_unreachable(self, packet, packet_in):
 
-        reply_message = pkt.unreach()
+        reply_message = icmp()
         reply_message.type = 3
         reply_message.payload = packet.payload.payload.payload
         reply_message.code = 0
@@ -216,4 +216,3 @@ def launch ():
     log.debug("Controlling %s" % (event.connection,))
     Router(event.connection)
   core.openflow.addListenerByName("ConnectionUp", start_switch)
-
